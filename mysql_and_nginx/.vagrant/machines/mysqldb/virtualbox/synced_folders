@@ -1,1 +1,0 @@
-{"virtualbox":{"/devops/db_files":{"guestpath":"/devops/db_files","hostpath":"/home/sylvioneto/Downloads/cursos/vagrant_dev/ubuntu-bionic64-mysql/db_files","disabled":false,"__vagrantfile":true},"/devops/config":{"guestpath":"/devops/config","hostpath":"/home/sylvioneto/Downloads/cursos/vagrant_dev/ubuntu-bionic64-mysql/config","disabled":false,"__vagrantfile":true}}}

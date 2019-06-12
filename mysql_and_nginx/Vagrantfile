@@ -8,12 +8,21 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
   
   config.vm.define "nginx" do |nginx|
-	  # network configuration
-	  nginx.vm.network "forwarded_port", guest: 80, host: 8081
-	  nginx.vm.network "public_network", type: "dhcp"
+	# network configuration
+	nginx.vm.network "forwarded_port", guest: 80, host: 8081
+	nginx.vm.network "public_network", type: "dhcp"
+
+	# computing resources
+	nginx.vm.provider "virtualbox" do |v|
+		v.memory = 2048
+		v.cpus = 1
+	end
 	  
-	  # package configuration
-	  nginx.vm.provision :shell, inline: "apt-get update && apt-get install -y nginx"
+	# sync folder
+	nginx.vm.synced_folder ".", "/vagrant", disabled: true
+
+	# package configuration
+	nginx.vm.provision :shell, inline: "apt-get update && apt-get install -y nginx"
   end	
 
 
