@@ -11,7 +11,7 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600 #1 hour
-        name: ["mysql-server-5.7", "python-mysqldb"]
+        name: ["mysql-server-5.7", "python3-mysqldb"]
         state: latest
       become: yes
 
