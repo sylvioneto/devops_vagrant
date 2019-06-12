@@ -12,3 +12,4 @@ Vagrant repo with environments created for software development
 - cd env_dev
 - vagrant up (create and start vms)
 - vagrant halt (shutdown vms)
+- vagrant ssh [vm] (connects to the specific vm)
