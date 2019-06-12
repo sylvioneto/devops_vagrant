@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "nginx" do |nginx|
 	# network configuration
 	nginx.vm.network "forwarded_port", guest: 80, host: 8081
-	nginx.vm.network "public_network", type: "dhcp"
+	nginx.vm.network "private_network", type: "dhcp"
 
 	# computing resources
 	nginx.vm.provider "virtualbox" do |v|
@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "mysqldb" do |mysql|
 	# network configuration
 	mysql.vm.network "forwarded_port", guest: 3306, host: 3307
-	mysql.vm.network "public_network", type: "dhcp"
+	mysql.vm.network "private_network", type: "dhcp"
 
 	# computing resources
 	mysql.vm.provider "virtualbox" do |v|

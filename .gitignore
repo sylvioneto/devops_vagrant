@@ -1,2 +1,2 @@
-mysql_and_nginx/*.log
-mysql_and_nginx/.vagrant
+env_dev/*.log
+env_dev/.vagrant
