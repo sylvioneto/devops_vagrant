@@ -7,4 +7,4 @@ Pre-req:
 Vagrant => https://www.terraform.io
 Virtualbox =>  https://www.virtualbox.org/wiki/Downloads
 
-env_dev => it creates a appserver (jboss + nginx) and a database server (mysql)
+env_dev => it creates a appserver (widlfly + nginx) and a database server (mysql)
