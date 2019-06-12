@@ -1,8 +1,8 @@
-Development environment using Oracle Virtual Box
+Dev environment for java developer
 
-NGInX running on host port 8081
+NGINX   running on host port 8081
+WILDFLY running on host port 8082
+MySQL   running on host port 3307
 
-MySQL server running on host port 3307
-
-config = it has config files used in different vms
-db_files = it has database files used by mysql vm
+config    = config files used in different vms
+db_files  = it has database files used by mysql vm
