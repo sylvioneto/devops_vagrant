@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
 	appserver.vm.network "forwarded_port", guest: 80,   host: 80
 	appserver.vm.network "forwarded_port", guest: 8080, host: 8080
 	appserver.vm.network "forwarded_port", guest: 9990, host: 9990
-	appserver.vm.network "public_network", type: "dhcp"
+	appserver.vm.network "private_network", ip: "172.28.128.6"
 
 	# computing resources
 	appserver.vm.provider "virtualbox" do |v|
@@ -34,6 +34,8 @@ Vagrant.configure("2") do |config|
 	appserver.vm.provision :shell, inline: "apt-get -q update && apt-get -q install -y nginx"
 	appserver.vm.provision :shell, inline: "apt-get -q install -y unzip"
 	appserver.vm.provision :shell, inline: "apt-get -q install -y openjdk-11-jre-headless"
+	appserver.vm.provision :shell, inline: "apt-get -q install -y openjdk-11-jre-headless"
+	appserver.vm.provision :shell, inline: "apt-get -q install -y python"
 
 	# install wildfly
 	appserver.vm.provision "shell", inline: $wildfly_script
@@ -42,7 +44,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "mysqldb" do |mysql|
 	# network configuration
 	mysql.vm.network "forwarded_port", guest: 3306, host: 3307
-	mysql.vm.network "public_network", type: "dhcp"
+	mysql.vm.network "private_network", ip: "172.28.128.7"
 
 	# computing resources
 	mysql.vm.provider "virtualbox" do |v|
@@ -55,15 +57,18 @@ Vagrant.configure("2") do |config|
 	mysql.vm.synced_folder "./db_files", "/devops/db_files"
 	mysql.vm.synced_folder "./config", "/devops/config"
 
-	# install mysql
-	mysql.vm.provision "shell", inline: $mysql_script
+	# package configuration
+	mysql.vm.provision :shell, inline: "apt-get -q update && apt-get install -y python"
 
-	# copy mysql config file
+	# load ssh key
 	mysql.vm.provision "shell",
-	inline: "cat /devops/db_files/mysqld.cnf > /etc/mysql/mysql.conf.d/mysqld.cnf && \
-			service mysql restart"
+		inline: "cat /devops/config/id_rsa_vagrant.pub >> .ssh/authorized_keys"
+
+	# run ansible
+	mysql.vm.provision "ansible" do |ansible|
+    	ansible.playbook = "config/ansible/playbook.yml"
+  	end
+
   end
 
-
-  
 end
