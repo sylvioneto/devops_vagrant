@@ -1,0 +1,49 @@
+$mysql_script = <<-SCRIPT
+	echo Installing mysql...
+	apt-get update && apt-get install -y mysql-server-5.7
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  # ubuntu image
+  config.vm.box = "ubuntu/bionic64"
+  
+  config.vm.define "nginx" do |nginx|
+	  # network configuration
+	  nginx.vm.network "forwarded_port", guest: 80, host: 8081
+	  nginx.vm.network "public_network", type: "dhcp"
+	  
+	  # package configuration
+	  nginx.vm.provision :shell, inline: "apt-get update && apt-get install -y nginx"
+  end	
+
+
+  config.vm.define "mysqldb" do |mysql|
+	# network configuration
+	mysql.vm.network "forwarded_port", guest: 3306, host: 3307
+	mysql.vm.network "public_network", type: "dhcp"
+
+	# computing resources
+	mysql.vm.provider "virtualbox" do |v|
+		v.memory = 4096
+		v.cpus = 2
+	end
+
+	# sync folder
+	mysql.vm.synced_folder ".", "/vagrant", disabled: true
+	mysql.vm.synced_folder "./db_files", "/devops/db_files"
+	mysql.vm.synced_folder "./config", "/devops/config"
+
+	# load keys
+	mysql.vm.provision "shell",
+	inline: "cat /devops/config/id_rsa_vagrant.pub >> .ssh/authorized_keys"
+
+	# install mysql
+	mysql.vm.provision "shell", inline: $mysql_script
+
+	# copy mysql config file
+	mysql.vm.provision "shell",
+	inline: "cat /devops/db_files/mysqld.cnf > /etc/mysql/mysql.conf.d/mysqld.cnf && \
+			service mysql restart"
+  end	
+  
+end
