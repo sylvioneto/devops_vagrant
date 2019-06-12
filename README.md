@@ -1,4 +1,5 @@
-# vagrant_dev
+# vagrant
+author: sylvio.pedroza@gmail.com
 
 Vagrant repo with environments created for software development
 
