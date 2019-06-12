@@ -1,35 +1,49 @@
 $mysql_script = <<-SCRIPT
 	echo Installing mysql...
-	apt-get update && apt-get install -y mysql-server-5.7
+	apt-get -q update && apt-get -q install -y mysql-server-5.7
 SCRIPT
+
+$wildfly = <<-SCRIPT
+	echo Downloading wildfly
+	wget -q https://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip
+	unzip wildfly-17.0.0.Final.zip -d /opt/
+SCRIPT
+
 
 Vagrant.configure("2") do |config|
   # ubuntu image
   config.vm.box = "ubuntu/bionic64"
   
-  config.vm.define "nginx" do |nginx|
+  config.vm.define "appserver" do |appserver|
 	# network configuration
-	nginx.vm.network "forwarded_port", guest: 80, host: 8081
-	nginx.vm.network "private_network", type: "dhcp"
+	appserver.vm.network "forwarded_port", guest: 80,   host: 80
+	appserver.vm.network "forwarded_port", guest: 8080, host: 8080
+	appserver.vm.network "forwarded_port", guest: 9990, host: 9990
+	appserver.vm.network "public_network", type: "dhcp"
 
 	# computing resources
-	nginx.vm.provider "virtualbox" do |v|
+	appserver.vm.provider "virtualbox" do |v|
 		v.memory = 2048
 		v.cpus = 1
 	end
 	  
 	# sync folder
-	nginx.vm.synced_folder ".", "/vagrant", disabled: true
+	appserver.vm.synced_folder ".", "/vagrant", disabled: true
 
 	# package configuration
-	nginx.vm.provision :shell, inline: "apt-get update && apt-get install -y nginx"
+	appserver.vm.provision :shell, inline: "apt-get -q update && apt-get -q install -y nginx"
+	appserver.vm.provision :shell, inline: "apt-get -q install -y unzip"
+	appserver.vm.provision :shell, inline: "apt-get -q install -y openjdk-11-jre-headless"
+
+	# install wildfly
+	appserver.vm.provision "shell", inline: $wildfly
   end	
 
 
   config.vm.define "mysqldb" do |mysql|
 	# network configuration
 	mysql.vm.network "forwarded_port", guest: 3306, host: 3307
-	mysql.vm.network "private_network", type: "dhcp"
+	mysql.vm.network "public_network", type: "dhcp"
 
 	# computing resources
 	mysql.vm.provider "virtualbox" do |v|
