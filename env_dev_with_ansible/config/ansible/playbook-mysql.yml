@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: mysqlserver
   handlers:
     - name: restart mysql
       service:
@@ -7,10 +7,17 @@
       become: yes
 
   tasks:
-    - name: 'Install MySQL Server'
+    - name: 'Install python'
       apt:
         update_cache: yes
         cache_valid_time: 3600 #1 hour
+        name: ["python3", "python"]
+        state: latest
+      become: yes
+
+    - name: 'Install MySQL Server'
+      apt:
+        update_cache: yes
         name: ["mysql-server-5.7", "python3-mysqldb"]
         state: latest
       become: yes
@@ -25,10 +32,11 @@
         state: present
       become: yes
 
-    - name: 'Copy mysqld.cnf file'
+    - name: 'Copy mysqld.cnf'
       copy:
-        src:  /home/sylvioneto/Downloads/cursos/vagrant_dev/env_dev_with_ansible/db_files/mysqld.cnf
+        src:  /devops/db_files/mysqld.cnf
         dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+        remote_src: yes
         owner: root
         group: root
         mode: 0644

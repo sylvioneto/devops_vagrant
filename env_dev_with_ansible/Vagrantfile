@@ -1,19 +1,15 @@
-$mysql_script = <<-SCRIPT
-	echo Installing mysql...
-	apt-get -q update && apt-get -q install -y mysql-server-5.7
+$add_ssh_key = <<-SCRIPT
+	echo adding ssh_key
+	cat /devops/config/id_rsa_vagrant.pub >> .ssh/authorized_keys
 SCRIPT
-
-$wildfly_script = <<-SCRIPT
-	echo Downloading wildfly
-	wget -q https://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip
-	unzip wildfly-17.0.0.Final.zip -d /opt/
-SCRIPT
-
 
 Vagrant.configure("2") do |config|
-  # ubuntu image
+  # set box
   config.vm.box = "ubuntu/bionic64"
   
+  # add ssh key
+  config.vm.provision "shell",	inline: $add_ssh_key
+
   config.vm.define "appserver" do |appserver|
 	# network configuration
 	appserver.vm.network "forwarded_port", guest: 80,   host: 80
@@ -29,21 +25,18 @@ Vagrant.configure("2") do |config|
 	  
 	# sync folder
 	appserver.vm.synced_folder ".", "/vagrant", disabled: true
+	appserver.vm.synced_folder "./config",	 "/devops/config"
 
-	# package configuration
-	appserver.vm.provision :shell, inline: "apt-get -q update && apt-get -q install -y nginx"
-	appserver.vm.provision :shell, inline: "apt-get -q install -y unzip"
-	appserver.vm.provision :shell, inline: "apt-get -q install -y openjdk-11-jre-headless"
-	appserver.vm.provision :shell, inline: "apt-get -q install -y openjdk-11-jre-headless"
-	appserver.vm.provision :shell, inline: "apt-get -q install -y python"
-
-	# install wildfly
-	appserver.vm.provision "shell", inline: $wildfly_script
+	# run ansible
+	appserver.vm.provision "ansible" do |ansible|
+		ansible.inventory_path = "./config/ansible/hosts"
+    	ansible.playbook = "./config/ansible/playbook-appserver.yml"
+  	end
   end	
 
-  config.vm.define "mysqldb" do |mysql|
+  config.vm.define "mysqlserver" do |mysql|
 	# network configuration
-	mysql.vm.network "forwarded_port", guest: 3306, host: 3307
+	mysql.vm.network "forwarded_port", guest: 3306, host: 3306
 	mysql.vm.network "private_network", ip: "172.28.128.7"
 
 	# computing resources
@@ -53,21 +46,14 @@ Vagrant.configure("2") do |config|
 	end
 
 	# sync folder
-	mysql.vm.synced_folder ".", "/vagrant", disabled: true
+	mysql.vm.synced_folder ".",			 "/vagrant", disabled: true
 	mysql.vm.synced_folder "./db_files", "/devops/db_files"
-	mysql.vm.synced_folder "./config", "/devops/config"
-
-	# package configuration
-	mysql.vm.provision :shell, inline: "apt-get -q update && apt-get install -y python"
-
-	# load ssh key
-	mysql.vm.provision "shell",
-		inline: "cat /devops/config/id_rsa_vagrant.pub >> .ssh/authorized_keys"
+	mysql.vm.synced_folder "./config",	 "/devops/config"
 
 	# run ansible
 	mysql.vm.provision "ansible" do |ansible|
 		ansible.inventory_path = "./config/ansible/hosts"
-    	ansible.playbook = "./config/ansible/playbook.yml"
+    	ansible.playbook = "./config/ansible/playbook-mysql.yml"
   	end
 
   end

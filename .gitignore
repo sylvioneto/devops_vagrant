@@ -5,3 +5,5 @@ env_dev_with_ansible/*.log
 env_dev_with_ansible/.vagrant
 env_dev_with_ansible/config/id_rsa_vagrant
 id_rsa_vagrant
+**/*.log
+**/*.retry

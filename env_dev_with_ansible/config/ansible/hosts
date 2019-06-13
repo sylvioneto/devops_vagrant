@@ -1,7 +1,16 @@
-[mysqldb]
+[mysqlserver]
 172.28.128.7
 
-[mysqldb:vars]
+[mysqlserver:vars]
+ansible_user=vagrant
+ansible_ssh_private_key_file=config/id_rsa_vagrant
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[appserver]
+172.28.128.6
+
+[appserver:vars]
 ansible_user=vagrant
 ansible_ssh_private_key_file=config/id_rsa_vagrant
 ansible_python_interpreter=/usr/bin/python3

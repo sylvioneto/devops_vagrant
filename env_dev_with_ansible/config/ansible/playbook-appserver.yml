@@ -1,0 +1,34 @@
+- hosts: appserver
+  tasks:
+    - name: 'Install NGINX'
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600 #1 hour
+        name: ["nginx"]
+        state: latest
+      become: yes
+
+    - name: 'Install java'
+      apt:
+        update_cache: yes
+        name: ["openjdk-11-jre-headless"]
+        state: latest
+      become: yes
+
+    - name: 'Install zip'
+      apt:
+        update_cache: yes
+        name: ["unzip"]
+        state: latest
+      become: yes
+        
+    - name: 'Download JBOSS'
+      get_url:
+        url: https://download.jboss.org/wildfly/17.0.0.Final/wildfly-17.0.0.Final.zip
+        dest: /tmp/wildfly-17.0.0.Final.zip
+        mode: '0755'
+      become: yes
+
+    - name: 'Install JBOSS'
+      shell: unzip /tmp/wildfly-17.0.0.Final.zip -d /opt/
+      become: yes
