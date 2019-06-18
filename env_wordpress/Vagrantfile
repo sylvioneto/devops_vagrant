@@ -18,11 +18,9 @@ Vagrant.configure("2") do |config|
 	end
 	  
 	# sync folders
-	wordpress.vm.synced_folder ".", "/vagrant", disabled: true
 	wordpress.vm.synced_folder "./config",	 "/devops/config"
 
   	wordpress.vm.provision "shell", inline: $add_ssh_key
-
 
   	wordpress.vm.provision :shell, inline: "apt-get -q update && apt-get -q install -y python"
 
