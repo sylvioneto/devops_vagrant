@@ -15,6 +15,11 @@
           - php7.2-xml
           - php7.2-mysql
           - php7.2-zip
+        state: latest
+      become: yes
+    - name: Install MySql dependencies
+      apt:
+        name: 
           - mysql-server-5.7
           - python-mysqldb
         state: latest
