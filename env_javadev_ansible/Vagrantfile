@@ -4,30 +4,25 @@ $add_ssh_key = <<-SCRIPT
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  # set box
   config.vm.box = "ubuntu/bionic64"
   
-  # add ssh key
   config.vm.provision "shell",	inline: $add_ssh_key
 
   config.vm.define "appserver" do |appserver|
-	# network configuration
 	appserver.vm.network "forwarded_port", guest: 80,   host: 8081
 	appserver.vm.network "forwarded_port", guest: 8080, host: 8080
 	appserver.vm.network "forwarded_port", guest: 9990, host: 9990
-	appserver.vm.network "private_network", ip: "172.28.128.6"
+	# uncomment to use ip access instead of forwarded port
+	#appserver.vm.network "private_network", ip: "172.28.128.6"
 
-	# computing resources
 	appserver.vm.provider "virtualbox" do |v|
 		v.memory = 2048
 		v.cpus = 1
 	end
 	  
-	# sync folder
 	appserver.vm.synced_folder ".", "/vagrant", disabled: true
 	appserver.vm.synced_folder "./config",	 "/devops/config"
 
-	# run ansible
 	appserver.vm.provision "ansible" do |ansible|
 		ansible.inventory_path = "./config/ansible/hosts"
     	ansible.playbook = "./config/ansible/appserver/playbook.yml"
@@ -35,22 +30,19 @@ Vagrant.configure("2") do |config|
   end	
 
   config.vm.define "mysqlserver" do |mysql|
-	# network configuration
 	mysql.vm.network "forwarded_port", guest: 3306, host: 3306
-	mysql.vm.network "private_network", ip: "172.28.128.7"
+	# uncomment to use ip access instead of forwarded port
+	#mysql.vm.network "private_network", ip: "172.28.128.7"
 
-	# computing resources
 	mysql.vm.provider "virtualbox" do |v|
 		v.memory = 4096
 		v.cpus = 2
 	end
 
-	# sync folder
 	mysql.vm.synced_folder ".",			 "/vagrant", disabled: true
 	mysql.vm.synced_folder "./db_files", "/devops/db_files"
 	mysql.vm.synced_folder "./config",	 "/devops/config"
 
-	# run ansible
 	mysql.vm.provision "ansible" do |ansible|
 		ansible.inventory_path = "./config/ansible/hosts"
     	ansible.playbook = "./config/ansible/mysql/playbook.yml"
