@@ -4,25 +4,21 @@ $add_ssh_key = <<-SCRIPT
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  # set box
   config.vm.box = "ubuntu/bionic64"
   
   config.vm.define "wordpress" do |wordpress|
-	# network configuration
 	wordpress.vm.network "private_network", ip: "172.28.128.8"
 
-	# computing resources
 	wordpress.vm.provider "virtualbox" do |v|
 		v.memory = 2048
 		v.cpus = 1
 	end
-	  
-	# sync folders
+
+	wordpress.vm.synced_folder ".", "/vagrant", disabled: true	  
 	wordpress.vm.synced_folder "./config",	 "/devops/config"
 
   	wordpress.vm.provision "shell", inline: $add_ssh_key
-
-  	wordpress.vm.provision :shell, inline: "apt-get -q update && apt-get -q install -y python"
+  	wordpress.vm.provision :shell, inline: "apt-get -q update"
 
 	# run ansible
 	#wordpress.vm.provision "ansible" do |ansible|

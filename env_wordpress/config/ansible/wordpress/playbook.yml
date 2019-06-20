@@ -1,8 +1,9 @@
 ---
 - hosts: all
   tasks:
-    - name: Install PHP and Apache2 dependencies
+    - name: Install PHP, Apache2 and Mysql dependencies
       apt:
+        update_cache: yes
         name: 
           - php7.2
           - apache2
@@ -15,12 +16,21 @@
           - php7.2-xml
           - php7.2-mysql
           - php7.2-zip
+          - mysql-server-5.7
+          - python3-mysqldb
         state: latest
       become: yes
-    - name: Install MySql dependencies
-      apt:
-        name: 
-          - mysql-server-5.7
-          - python-mysqldb
-        state: latest
+
+    - name: Create mysql database - wordpress_db
+      mysql_db:
+        name: wordpress_db
+        state: present 
+      become: yes
+
+    - name: Create admin user with all database privileges
+      mysql_user:
+        name: admin
+        password: admin1
+        priv: '*.*:ALL'
+        state: present
       become: yes
