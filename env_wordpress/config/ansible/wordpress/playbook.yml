@@ -1,5 +1,13 @@
 ---
 - hosts: all
+
+  handlers:
+    - name: restart_apache
+      service:
+        name: apache2
+        state: restarted
+      become: yes
+
   tasks:
     - name: Install PHP, Apache2 and Mysql dependencies
       apt:
@@ -60,4 +68,24 @@
         src: '/var/www/wordpress/wp-config-sample.php'
         dest: '/var/www/wordpress/wp-config.php'
         remote_src: yes
-      become: yes       
+      become: yes
+
+    - name: Replace WP configuration values
+      replace:
+        path: '/var/www/wordpress/wp-config.php'
+        regexp: "{{ item.regex }}"
+        replace: "{{ item.value }}"
+      with_items:
+        - { regex: 'database_name_here', value: 'wordpress_db'}
+        - { regex: 'username_here', value: ' wordpress_user'}
+        - { regex: 'password_here', value: 'wordpress_pass'} 
+      become: yes
+
+    - name: Copy 000-default.conf
+      copy:
+        src: '/devops/config/000-default.conf'
+        dest: '/etc/apache2/sites-available/000-default.conf'
+        remote_src: yes 
+      become: yes  
+      notify:
+          - restart_apache
