@@ -104,7 +104,7 @@
         replace: "{{ item.value }}"
       with_items:
         - { regex: 'database_name_here', value: 'wordpress_db'}
-        - { regex: 'username_here', value: ' wordpress_user'}
+        - { regex: 'username_here', value: 'wordpress_user'}
         - { regex: 'password_here', value: 'wordpress_pass'}
         - { regex: 'localhost', value: '172.28.128.9'}  
       become: yes
