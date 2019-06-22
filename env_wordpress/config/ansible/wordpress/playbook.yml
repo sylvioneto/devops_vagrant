@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: wp_app
 
   handlers:
     - name: restart_apache
@@ -9,7 +9,7 @@
       become: yes
 
   tasks:
-    - name: Install PHP, Apache2 and Mysql dependencies
+    - name: Install PHP and Apache2 dependencies
       apt:
         update_cache: yes
         name: 
@@ -24,32 +24,9 @@
           - php7.2-xml
           - php7.2-mysql
           - php7.2-zip
-          - mysql-server-5.7
           - python3-mysqldb
         state: latest
       become: yes
-
-    - name: Create mysql database - wordpress_db
-      mysql_db:
-        name: wordpress_db
-        state: present 
-      become: yes
-
-    - name: Create a admin user
-      mysql_user:
-        name: admin
-        password: admin1
-        priv: '*.*:ALL'
-        state: present
-      become: yes
-
-    - name: Create a wordpress user
-      mysql_user:
-        name: wordpress_user
-        password: wordpress_pass
-        priv: 'wordpress_db.*:ALL'
-        state: present
-      become: yes  
 
     - name: Download wordpress package
       get_url:
@@ -79,6 +56,7 @@
         - { regex: 'database_name_here', value: 'wordpress_db'}
         - { regex: 'username_here', value: ' wordpress_user'}
         - { regex: 'password_here', value: 'wordpress_pass'} 
+        - { regex: 'localhost', value: '172.28.128.9'} 
       become: yes
 
     - name: Copy 000-default.conf
