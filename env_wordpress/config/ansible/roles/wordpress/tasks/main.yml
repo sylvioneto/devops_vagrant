@@ -1,0 +1,39 @@
+---
+- name: Download wordpress package
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /tmp/wordpress.tar.gz
+
+- name: Extract wordpress.tar.gz
+  unarchive:
+    src: /tmp/wordpress.tar.gz
+    dest: /var/www/
+    remote_src: yes
+  become: yes
+
+- name: Copy WP config files
+  copy:
+    src: "{{ wp_app_wordpress_home }}/wp-config-sample.php"
+    dest: "{{ wp_app_wordpress_home }}/wp-config.php"
+    remote_src: yes
+  become: yes
+
+- name: Replace WP configuration values
+  replace:
+    path: "{{ wp_app_wordpress_home }}/wp-config.php"
+    regexp: "{{ item.regex }}"
+    replace: "{{ item.value }}"
+  with_items:
+    - { regex: 'database_name_here', value: "{{ wp_db_name }}"}
+    - { regex: 'username_here', value: "{{ wp_db_user }}"}
+    - { regex: 'password_here', value: "{{ wp_db_pass }}"}
+    - { regex: 'localhost', value: "{{ wp_db_hostname }}"}  
+  become: yes
+
+- name: 'Set Apache 000-default.conf to user wordpress'
+  template:
+    src: 'templates/000-default.conf.j2'
+    dest: '/etc/apache2/sites-available/000-default.conf'
+  become: yes  
+  notify:
+      - restart_apache

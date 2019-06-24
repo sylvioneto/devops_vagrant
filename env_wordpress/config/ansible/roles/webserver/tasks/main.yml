@@ -1,0 +1,19 @@
+---
+- name: Install PHP and Apache2 dependencies
+  apt:
+    update_cache: yes
+    name: 
+      - php7.2
+      - apache2
+      - libapache2-mod-php7.2
+      - php7.2-cli
+      - php7.2-common
+      - php7.2-mbstring
+      - php7.2-gd
+      - php7.2-intl
+      - php7.2-xml
+      - php7.2-mysql
+      - php7.2-zip
+      - python3-mysqldb
+    state: latest
+  become: yes
