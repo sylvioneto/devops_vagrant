@@ -1,0 +1,7 @@
+---
+wp_db_name: wordpress_db
+wp_db_admin_user: admin
+wp_db_admin_pass: admin1
+wp_db_user: wordpress_user
+wp_db_pass: wordpress_pass
+wp_db_hostname: 172.28.128.9
