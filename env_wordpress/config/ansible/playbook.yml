@@ -1,9 +1,8 @@
 ---
-- hosts: wp_mysql
+- hosts: db_server
   roles:
     - mysql
 
-- hosts: wp_app
+- hosts: app_server
   roles:
-    - webserver
     - wordpress
